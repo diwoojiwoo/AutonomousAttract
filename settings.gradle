@@ -1,0 +1,31 @@
+pluginManagement {
+    repositories {
+        google()
+        mavenCentral()
+        gradlePluginPortal()
+        maven {
+            url "https://dasom-beanq.firebaseapp.com/repository/"
+        }
+    }
+    plugins {
+        id "com.android.application" version "8.1.4"
+        id "com.android.library" version "8.1.4"
+        id "org.jetbrains.kotlin.android" version "1.9.0"
+        id "androidx.navigation.safeargs" version "2.5.3"
+    }
+}
+
+dependencyResolutionManagement {
+    repositoriesMode.set(RepositoriesMode.FAIL_ON_PROJECT_REPOS)
+    repositories {
+        google()
+        mavenCentral()
+        maven {
+            url "https://dasom-beanq.firebaseapp.com/repository/"
+        }
+        maven { url "https://jitpack.io" }
+    }
+}
+
+rootProject.name = "AutonomousAttract"
+include(":app")

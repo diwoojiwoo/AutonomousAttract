@@ -1,0 +1,29 @@
+# Android Studio generated files
+.gradle/
+/build/
+/captures/
+.DS_Store
+
+# Local configuration file (sdk path, etc)
+local.properties
+
+# IDE files
+.idea/
+*.iml
+
+# Keystore files
+*.jks
+*.keystore
+
+# Google Services (if you use them)
+google-services.json
+
+# Crashlytics (if you use them)
+**/fabric.properties
+
+# Proguard output files
+**/proguard/
+
+# APK and AAB files
+*.apk
+*.aab
