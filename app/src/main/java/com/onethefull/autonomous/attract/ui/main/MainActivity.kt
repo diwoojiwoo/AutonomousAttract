@@ -3,6 +3,12 @@ package com.onethefull.autonomous.attract.ui.main
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
 import com.onethefull.autonomous.attract.R
+import com.onethefull.autonomous.attract.utils.logger.DWLog
+import com.onethefull.wonderfulrobotmodule.robot.BaseRobotController
+import com.onethefull.wonderfulrobotmodule.robot.IRobotServiceListener
+import kotlinx.coroutines.MainScope
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 
 class MainActivity : AppCompatActivity() {
 
@@ -16,4 +22,22 @@ class MainActivity : AppCompatActivity() {
                 .commitNow()
         }
     }
+
+    override fun onResume() {
+        super.onResume()
+        BaseRobotController.initialize(application)
+    }
+
+
+    override fun onPause() {
+        super.onPause()
+        DWLog.e("Mainactivity onPause")
+        BaseRobotController.removeRobotServiceListener(robotServiceListener)
+    }
+
+    val robotServiceListener =
+        object : IRobotServiceListener.Stub() {
+            override fun onResponseRobotService(type: Int, json: String?) {
+            }
+        }
 }

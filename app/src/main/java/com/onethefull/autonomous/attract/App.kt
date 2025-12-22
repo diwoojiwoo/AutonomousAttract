@@ -7,6 +7,7 @@ import android.content.Context
 import android.content.Intent
 import android.os.Bundle
 import android.os.PowerManager
+import androidx.appcompat.app.AppCompatActivity
 import com.onethefull.autonomous.attract.ui.main.MainActivity
 import com.onethefull.autonomous.attract.utils.logger.DWLog
 import com.onethefull.wonderfulrobotmodule.provider.DasomProvider
@@ -17,27 +18,12 @@ import java.io.Serializable
 
 class App : Application() {
     lateinit var provider: DasomProvider
-
-    /**
-     * 로봇 서비스 연결 상태를 수신하는 리스너입니다.
-     * BaseRobotController.initialize의 파라미터에 맞는 StartListener를 사용합니다.
-     */
-    private val robotStartListener = object : BaseRobotController.StartListener {
-        override fun onStartService() {
-            DWLog.d("Robot service connected! (onStartService)")
-            isRobotConnected = true
-        }
-    }
+    var currentActivity: AppCompatActivity? = null
 
     override fun onCreate() {
         super.onCreate()
         instance = this
         provider = DasomProvider(this)
-
-        // 로봇 컨트롤러를 초기화하고 서비스에 연결합니다.
-        DWLog.d("Initializing Robot Controller...")
-        BaseRobotController.initialize(this, robotStartListener)
-
         initSceneHelper()
     }
 
@@ -52,6 +38,8 @@ class App : Application() {
 
             override fun onSwitchOut() {
                 super.onSwitchOut()
+                currentActivity?.finish()
+                currentActivity = null
                 mWakeLock?.release()
             }
 
@@ -68,13 +56,25 @@ class App : Application() {
         })
     }
 
+    private fun startActionActivity(send: Intent) {
+        if (currentActivity != null && currentActivity is MainActivity) {
+            (currentActivity as MainActivity).apply {
+                intent = send
+            }.run {
+            }
+        } else {
+            send.addFlags(Intent.FLAG_ACTIVITY_NO_ANIMATION)
+            startActivity(send)
+        }
+    }
+
     fun onCommand(action: String?, params: Bundle?, suggestion: Serializable?) {
         val send = Intent(instance, MainActivity::class.java)
         send.addFlags(Intent.FLAG_ACTIVITY_NO_ANIMATION)
         send.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
         DWLog.w("onCommand action: $action")
 
-        startActivity(send, ActivityOptions.makeCustomAnimation(this@App, 0, 0).toBundle())
+        startActionActivity(send)
     }
 
     private fun wakeLock() {
@@ -95,9 +95,6 @@ class App : Application() {
         lateinit var instance: App
             private set
 
-        const val TAG = "AutonomousAttract"
-
-        var isRobotConnected = false
-            private set
+        const val TAG = "DasomAutonomousAttract"
     }
 }
