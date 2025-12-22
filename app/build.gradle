@@ -44,6 +44,9 @@ dependencies {
     // Wonderful SDK
     implementation 'com.onethefull:wonderfulrobot:1.0.38-host'
     implementation 'com.google.code.gson:gson:2.10.1' // Or the latest version
+
     // Add this line to expose the AIDL interfaces like IConnectionListener
     api 'com.onethefull:wonderfulrobot:1.0.38-host'
+
+    implementation 'com.airbnb.android:lottie:6.1.0'
 }

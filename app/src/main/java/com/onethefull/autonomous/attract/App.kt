@@ -96,5 +96,7 @@ class App : Application() {
             private set
 
         const val TAG = "DasomAutonomousAttract"
+
+        const val DEVICE_KEBBI = "KEBBI"
     }
 }
