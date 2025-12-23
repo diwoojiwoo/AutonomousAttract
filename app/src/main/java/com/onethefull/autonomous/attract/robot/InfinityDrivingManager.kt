@@ -2,8 +2,10 @@ package com.onethefull.autonomous.attract.robot
 
 import com.onethefull.autonomous.attract.utils.logger.DWLog
 import com.onethefull.wonderfulrobotmodule.robot.BaseRobotController
+import com.onethefull.wonderfulrobotmodule.robot.KebbiMotion
 import kotlinx.coroutines.*
 import org.json.JSONObject
+
 object InfinityDrivingManager {
 
     private val scope = CoroutineScope(Dispatchers.IO + SupervisorJob())
@@ -11,21 +13,58 @@ object InfinityDrivingManager {
     private const val MOVE = 11
     private const val TURN = 12
 
-    private const val STEP_SPEED = 0.03f      // 전진 속도
-    private const val CURVE_SPEED = 5f        // 살짝 회전
-    private const val WHEEL_TURN_SPEED = 15f  // 한쪽 바퀴 중심 회전 속도
-    private const val STEP_DURATION = 750L
-    private const val TURN_DURATION = 500L    // 바퀴 중심 회전 시간
+    private const val MAX_WHEEL_DELAY = 1250L
+    private const val WHEEL_MOVE_SPEED = 0.05f
+    private const val WHEEL_TURN_SPEED = 25f
+    private const val ACTION_MOVE = 11
+    private const val ACITON_TURN = 12
+
+    const val DIRECTION_FORWARD = 1
+    const val DIRECTION_BACKWARD = -1
+
+    const val DIRECTION_LEFT = -1
+    const val DIRECTION_RIGHT = 1
 
     fun startInfinityLoop() {
         stop()
         BaseRobotController.robotService?.robotMotor?.setWheelLockState(false)
 
+        var moveSpeed = 0.00f
+        var turnSpeed = 5f
+        val moveDistance = (MAX_WHEEL_DELAY / moveSpeed).toInt()
+        val wheelDistance = (MAX_WHEEL_DELAY / turnSpeed).toInt()
+
         scope.launch {
             try {
+
                 while (isActive) {
-                    singleForwardCurveStep()
+                    turn()
                 }
+
+//                repeat(3) {
+//                    turnWheelLeft(30)
+//                }
+//                repeat(10) {
+//                    forwardMoving()
+//                }
+//                repeat(3) {
+//                    turnWheelRight(30)
+//                }
+//                repeat(10) {
+//                    forwardMoving()
+//                }
+//                repeat(3) {
+//                    turnWheelRight(30)
+//                }
+//                repeat(10) {
+//                    forwardMoving()
+//                }
+//                repeat(3) {
+//                    turnWheelRight(30)
+//                }
+//                repeat(10) {
+//                    forwardMoving()
+//                }
             } finally {
                 stopWheel()
             }
@@ -33,51 +72,169 @@ object InfinityDrivingManager {
     }
 
     fun emergencyStop() = stop()
-    suspend fun singleForwardCurveStep() {
+
+    private suspend fun forwardMoving() { //delay : distance*speed
+        DWLog.d("forwardMoving")
         try {
-            DWLog.d("InfinityDrivingManager", "Step START: singleForwardCurveStep")
-
-            // 왼쪽으로 살짝 꺾으면서 전진
-            BaseRobotController.robotService?.setMotor(
-                JSONObject().apply {
-                    put("position", 11)   // 전진
-                    put("degree", 5000)
-                    put("speed", 0.02f)   // 느린 전진
-                }.toString()
-            )
-            BaseRobotController.robotService?.setMotor(
-                JSONObject().apply {
-                    put("position", 12)   // 회전
-                    put("degree", 5000)
-                    put("speed", -5f)     // 왼쪽 살짝
-                }.toString()
-            )
-            DWLog.d("InfinityDrivingManager", "Moving forward with slight left curve")
-            delay(2000)  // 2초 이동
+            BaseRobotController.robotService?.setMotor(JSONObject().apply {
+                this.put("position", 11)
+                this.put("degree", 5000)
+                this.put("speed", 0.06f)
+            }.toString())
+            delay(100)
             BaseRobotController.robotService?.robotMotor?.stopWheel()
-            DWLog.d("InfinityDrivingManager", "Stopped after curve step")
-            delay(200) // 관성 방지
-
-            // 앞으로 직진 1초
-            BaseRobotController.robotService?.setMotor(
-                JSONObject().apply {
-                    put("position", 11)
-                    put("degree", 5000)
-                    put("speed", 0.02f)
-                }.toString()
-            )
-            DWLog.d("InfinityDrivingManager", "Moving forward straight for 1 sec")
-            delay(1000)  // 1초 이동
-            BaseRobotController.robotService?.robotMotor?.stopWheel()
-            DWLog.d("InfinityDrivingManager", "Stopped after straight step")
-
-            DWLog.d("InfinityDrivingManager", "Step END: singleForwardCurveStep")
         } catch (e: Exception) {
-            DWLog.e("InfinityDrivingManager", "Exception in singleForwardCurveStep: ${e.message}")
+            e.printStackTrace()
+            BaseRobotController.robotService?.robotMotor?.stopWheel()
+        }
+    }
+
+    private suspend fun backwardMoving() {
+        try {
+            BaseRobotController.robotService?.setMotor(JSONObject().apply {
+                this.put("position", 11)
+                this.put("degree", 5000)
+                this.put("speed", -0.04f)
+            }.toString())
+            delay(100)
+            BaseRobotController.robotService?.robotMotor?.stopWheel()
+        } catch (e: Exception) {
+            e.printStackTrace()
+            BaseRobotController.robotService?.robotMotor?.stopWheel()
+        }
+    }
+
+    private suspend fun turnWheelLeft(degree: Int = 30) {
+        DWLog.d("turnWheelLeft")
+        try {
+            BaseRobotController.robotService?.robotMotor?.turnWheelLeft(degree)
+            delay(500)
+            BaseRobotController.robotService?.robotMotor?.stopWheel()
+        } catch (e: Exception) {
+            e.printStackTrace()
+            BaseRobotController.robotService?.robotMotor?.stopWheel()
+        }
+    }
+
+    private suspend fun turnWheelRight(degree: Int = 30) {
+        try {
+            BaseRobotController.robotService?.robotMotor?.turnWheelRight(degree)
+            delay(500)
+            BaseRobotController.robotService?.robotMotor?.stopWheel()
+        } catch (e: Exception) {
+            e.printStackTrace()
+            BaseRobotController.robotService?.robotMotor?.stopWheel()
+        }
+    }
+
+    private suspend fun turn() {
+        BaseRobotController.robotService?.robotMotor?.motionStart(KebbiMotion.motionList.get(12), null)
+    }
+
+    /**
+     * position : 11  , degree * speed = 1초 , speed -0.1~0.1 : 전후진
+     * position : 12 ,  degree * speed = 1초 , degree/sec -30/30 : 회전
+     * @param position 11 전후진 , 12 회전
+     * @param degree degree * speed = 1초
+     * @param speed speed -0.1~0.1 : 전후진,  degree/sec -30/30 : 회전
+     * @param delay during
+     */
+    private suspend fun startWheelAction(
+        position: Int,
+        degree: Int,
+        speed: Float,
+        delay: Long,
+    ) {
+        try {
+            BaseRobotController.robotService?.setMotor(wheelCommand(position, degree, speed))
+            delay(delay)
+        } catch (e: Exception) {
             e.printStackTrace()
         }
     }
 
+    private val wheelCommand: (Int, Int, Float) -> (String) = { position, degree, speed ->
+        try {
+            JSONObject().apply {
+                this.put("position", position)
+                this.put("degree", degree)
+                this.put("speed", speed)
+            }.toString()
+        } catch (e: Exception) {
+            e.printStackTrace()
+            String()
+        }
+
+    }
+
+    private suspend fun infinityOnce() {
+        // 왼쪽 고리
+        leftHalfCircle()
+
+        // 중앙 교차
+        crossCenter()
+
+        // 오른쪽 고리
+        rightHalfCircle()
+
+        // 중앙 복귀
+        crossCenter()
+    }
+
+    private suspend fun forwardOnce() {
+        BaseRobotController.robotService?.setMotor(
+            JSONObject().apply {
+                put("position", 11)
+                put("degree", 2000)   // 중요: 작게
+                put("speed", 0.08f)  // 고정
+            }.toString()
+        )
+        delay(180)   // ★ 여기 핵심
+    }
+
+    private suspend fun microTurnLeft() {
+        BaseRobotController.robotService?.setMotor(
+            JSONObject().apply {
+                put("position", 12)
+                put("degree", 600)     // 아주 작게
+                put("speed", -4f)
+            }.toString()
+        )
+        delay(120)
+    }
+
+    private suspend fun microTurnRight() {
+        BaseRobotController.robotService?.setMotor(
+            JSONObject().apply {
+                put("position", 12)
+                put("degree", 600)
+                put("speed", 4f)
+            }.toString()
+        )
+        delay(120)
+    }
+
+    private suspend fun leftHalfCircle() {
+        repeat(10) {
+            forwardOnce()
+            forwardOnce()
+            microTurnLeft()
+        }
+    }
+
+    private suspend fun rightHalfCircle() {
+        repeat(10) {
+            forwardOnce()
+            forwardOnce()
+            microTurnRight()
+        }
+    }
+
+    private suspend fun crossCenter() {
+        repeat(6) {
+            forwardOnce()
+        }
+    }
 
     private fun stopWheel() {
         try {

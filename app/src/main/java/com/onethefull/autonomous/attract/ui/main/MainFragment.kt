@@ -20,13 +20,15 @@ class MainFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
+        InfinityDrivingManager.startInfinityLoop()
+
         view.findViewById<Button>(R.id.button_infinity).setOnClickListener {
             InfinityDrivingManager.startInfinityLoop()
         }
 
-        view.findViewById<Button>(R.id.button_once).setOnClickListener {
-//            InfinityDrivingManager.startInfinityOnce()
-        }
+//        view.findViewById<Button>(R.id.button_once).setOnClickListener {
+////            InfinityDrivingManager.startInfinityOnce()
+//        }
 
         view.findViewById<Button>(R.id.button_stop_driving).setOnClickListener {
             InfinityDrivingManager.emergencyStop()

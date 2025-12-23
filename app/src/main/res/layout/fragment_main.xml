@@ -26,12 +26,14 @@
         android:id="@+id/button_infinity"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="startInfinityLoop"
+        android:text="주행 시작"
+        android:textSize="50sp"
+        android:layout_marginBottom="50dp"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintBottom_toTopOf="@id/button_once"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintVertical_chainStyle="packed" />
+        app:layout_constraintVertical_chainStyle="packed"/>
 
     <!-- Start Infinity Once -->
     <Button
@@ -43,7 +45,8 @@
         app:layout_constraintTop_toBottomOf="@id/button_infinity"
         app:layout_constraintBottom_toTopOf="@id/button_stop_driving"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent" />
+        app:layout_constraintEnd_toEndOf="parent"
+        android:visibility="gone"/>
 
     <!-- Stop Driving -->
     <Button
@@ -51,6 +54,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="주행 중지"
+        android:textSize="50sp"
         app:layout_constraintTop_toBottomOf="@id/button_once"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintStart_toStartOf="parent"
