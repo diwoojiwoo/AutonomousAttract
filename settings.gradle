@@ -24,6 +24,9 @@ dependencyResolutionManagement {
             url "https://dasom-beanq.firebaseapp.com/repository/"
         }
         maven { url "https://jitpack.io" }
+        flatDir {
+            dirs "app/libs"
+        }
     }
 }
 

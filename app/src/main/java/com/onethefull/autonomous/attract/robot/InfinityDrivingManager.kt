@@ -37,8 +37,8 @@ object InfinityDrivingManager {
         scope.launch {
             try {
 
-                while (isActive) {
-                    turn()
+                while(isActive) {
+                    drawFigureEight180()
                 }
 
 //                repeat(3) {
@@ -127,9 +127,31 @@ object InfinityDrivingManager {
         }
     }
 
-    private suspend fun turn() {
-        BaseRobotController.robotService?.robotMotor?.motionStart(KebbiMotion.motionList.get(12), null)
+    suspend fun drawFigureEight180() {
+
+        BaseRobotController.robotService
+            ?.robotMotor
+            ?.motionStart("666_BA_TurnL180", null)
+        delay(1800)
+
+        BaseRobotController.robotService
+            ?.robotMotor
+            ?.motionStart("666_BA_TurnL180", null)
+        delay(1800)
+
+        // 중앙 교차 느낌
+        delay(300)
+
+        BaseRobotController.robotService
+            ?.robotMotor
+            ?.motionStart("666_BA_TurnR180", null)
+        delay(1800)
+
+        BaseRobotController.robotService
+            ?.robotMotor
+            ?.motionStart("666_BA_TurnR180", null)
     }
+
 
     /**
      * position : 11  , degree * speed = 1초 , speed -0.1~0.1 : 전후진

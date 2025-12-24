@@ -42,11 +42,11 @@ dependencies {
     androidTestImplementation libs.androidx.espresso.core
 
     // Wonderful SDK
-    implementation 'com.onethefull:wonderfulrobot:1.0.38-host'
-    implementation 'com.google.code.gson:gson:2.10.1' // Or the latest version
-
+//    implementation 'com.onethefull:wonderfulrobot:1.0.38-host'
     // Add this line to expose the AIDL interfaces like IConnectionListener
-    api 'com.onethefull:wonderfulrobot:1.0.38-host'
+//    api 'com.onethefull:wonderfulrobot:1.0.38-host'
+    implementation(name: "WonderfulRobotSDK_1.0.38-host-release", ext: "aar")
+    implementation 'com.google.code.gson:gson:2.10.1' // Or the latest version
 
     implementation 'com.airbnb.android:lottie:6.1.0'
 }

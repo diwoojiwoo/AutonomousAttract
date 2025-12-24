@@ -1,0 +1,24 @@
+<resources>
+    <string name="app_name">AutonomousAttract</string>
+
+    <string name="attract_human_joke_1">
+        Shh. I\'m pretending to be human right now. Did I get caught? Just kidding. But I can chat better than most real people. If you don\'t believe me, say hello.
+    </string>
+
+    <string name="attract_human_joke_2">
+        We just made eye contact, didn\'t we? If you walk away now, you\'ll break my AI heart. Play with me for just one minute. You won\'t regret it.
+    </string>
+
+    <string name="attract_human_joke_3">
+        Curious about my IQ? Actually, I don\'t know either. I left it in the cloud. But don\'t worry, I can still answer almost anything.
+    </string>
+
+    <string name="attract_human_joke_4">
+        Hey there, stylish visitor. Yes, you. Why not take a selfie with me? I have excellent lighting, so I look great in photos.
+    </string>
+
+    <string name="attract_human_joke_5">
+        Unfortunately, I can\'t brew coffee. I don\'t have hands. But I can brew up a conversation that\'ll wake you right up. Touch the screen and try me.
+    </string>
+
+</resources>
