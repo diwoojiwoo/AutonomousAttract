@@ -8,7 +8,9 @@ import android.view.View
 import android.widget.ImageView
 import androidx.annotation.RawRes
 import com.airbnb.lottie.LottieAnimationView
+import com.airbnb.lottie.LottieDrawable
 import com.airbnb.lottie.RenderMode
+import com.onethefull.autonomous.attract.App
 import com.onethefull.autonomous.attract.R
 import com.onethefull.autonomous.attract.data.animation.AnimationData
 import com.onethefull.autonomous.attract.utils.logger.DWLog
@@ -17,7 +19,6 @@ import com.onethefull.dasomiconv.utils.animation.maker.AnimationMakerKebbi
 import com.onethefull.autonomous.attract.utils.robot.kebbi.RobotActionKebbi
 import com.onethefull.wonderfulrobotmodule.robot.BaseRobotController
 import com.onethefull.wonderfulrobotmodule.robot.KebbiMotion
-import kotlinx.coroutines.CoroutineExceptionHandler
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
@@ -100,24 +101,24 @@ class BackgroundUiActionDasom(val context: Activity, var root: View) :
             enableMergePathsForKitKatAndAbove(true)
             renderMode = RenderMode.SOFTWARE
             if (!isAnimating) {
-                DWLog.i("[${UiAction.TAG}] SOODA_ANIMATION : animationView is not Animating !")
+                DWLog.i("[${UiAction.TAG}] ${App.TAG}_ANIMATION : animationView is not Animating !")
                 setAnimation(newAnimResId)
                 scaleType = ImageView.ScaleType.FIT_CENTER
                 repeatCount =
                     if (isOpening) {
                         isOpening = false
-                        0
-                    } else 0
+                        LottieDrawable.INFINITE
+                    } else LottieDrawable.INFINITE
                 getLottieComposition(context, newAnimResId)?.let { result ->
                     setComposition(result)
                     playAnimation()
                 }
             } else if (newAnimResId == currentAnimResId) {
-                DWLog.i("[${UiAction.TAG}] SOODA_ANIMATION : same animation play !")
+                DWLog.i("[${UiAction.TAG}] ${App.TAG}_ANIMATION : same animation play !")
             } else {
-                DWLog.i("[${UiAction.TAG}] SOODA_ANIMATION : different animation! re prepared ! $contentVar")
+                DWLog.i("[${UiAction.TAG}] ${App.TAG}_ANIMATION : different animation! re prepared ! $contentVar")
                 getLottieComposition(context, newAnimResId)?.let { result ->
-                    repeatCount = 0
+                    repeatCount = LottieDrawable.INFINITE
                     setComposition(result)
                     playAnimation()
                 }
@@ -165,33 +166,23 @@ class BackgroundUiActionDasom(val context: Activity, var root: View) :
         DWLog.d("[${UiAction.TAG}] finishAction $textJob [loadingActionSteop]$loadingActionStep")
     }
 
-    private val handlerException = CoroutineExceptionHandler { context, throwable ->
-        DWLog.w("[${UiAction.TAG}]  CoroutineExceptionHandler ${throwable.message}")
-    }
-
     private var loadingActionStep = 0
 
     override fun doNextAnimation() {
-
-        DWLog.d("[${UiAction.TAG}]  doNextAnimation [isWait:$isWait]\t[isWakeUp:$isWakeUp]\t[customHintText:$customHintText]")
+        DWLog.d("[${UiAction.TAG}]  doNextAnimation [isWait:$isWait]")
         if (isOpening) {
             animationMaker.getAnimationData(LISTENING)
         } else {
-            if (isWakeUp) {
-                finishAction()
-                animationMaker.getAnimationData(LISTENING)
+            if (isWait) {
+                val loadingAni = animationMaker.getLoadingAnimations()[loadingActionStep]
+                startWaitingAction()
+                animationMaker.getAnimationData(loadingAni)
             } else {
-                if (isWait) {
-                    val loadingAni = animationMaker.getLoadingAnimations()[loadingActionStep]
-                    startWaitingAction()
-                    animationMaker.getAnimationData(loadingAni)
+                if (isSpeaking) {
+                    finishAction()
+                    getContentResId()
                 } else {
-                    if (isSpeaking) {
-                        finishAction()
-                        getContentResId()
-                    } else {
-                        animationMaker.getAnimationData(contentVar)
-                    }
+                    animationMaker.getAnimationData(contentVar)
                 }
             }
         }.run {
@@ -229,7 +220,7 @@ class BackgroundUiActionDasom(val context: Activity, var root: View) :
      */
     private fun addMotion(latestMotion: String) {
         val motion = KebbiMotion.getKebbiMotionEM().random()
-        DWLog.d("[${UiAction.TAG}] finishMotion  -> addMotion $isWait $isWakeUp $motion")
+        DWLog.d("[${UiAction.TAG}] finishMotion  -> addMotion $isWait $motion")
         BaseRobotController.robotService?.robotMotor?.motionStop()
         CoroutineScope(Dispatchers.IO).launch {
             delay(500)

@@ -1,13 +1,20 @@
 package com.onethefull.autonomous.attract.robot
 
+import com.onethefull.autonomous.attract.App
 import com.onethefull.autonomous.attract.utils.logger.DWLog
 import com.onethefull.wonderfulrobotmodule.robot.BaseRobotController
+import com.onethefull.wonderfulrobotmodule.robot.IMotionCallback
 import com.onethefull.wonderfulrobotmodule.robot.KebbiMotion
 import kotlinx.coroutines.*
 import org.json.JSONObject
 
 object InfinityDrivingManager {
 
+    interface DrivingListener {
+        fun onDrivingFinished()
+    }
+
+    var drivingListener: DrivingListener? = null
     private val scope = CoroutineScope(Dispatchers.IO + SupervisorJob())
 
     private const val MOVE = 11
@@ -29,47 +36,22 @@ object InfinityDrivingManager {
         stop()
         BaseRobotController.robotService?.robotMotor?.setWheelLockState(false)
 
-        var moveSpeed = 0.00f
-        var turnSpeed = 5f
-        val moveDistance = (MAX_WHEEL_DELAY / moveSpeed).toInt()
-        val wheelDistance = (MAX_WHEEL_DELAY / turnSpeed).toInt()
-
         scope.launch {
             try {
+                repeat(1) { drawFigureEight() }
+                delay(4000L)
+                repeat(20) { forwardMoving() }
 
-                while(isActive) {
-                    drawFigureEight180()
+                // 주행 종료 시점 콜백
+                withContext(Dispatchers.Main) {
+                    drivingListener?.onDrivingFinished()
                 }
-
-//                repeat(3) {
-//                    turnWheelLeft(30)
-//                }
-//                repeat(10) {
-//                    forwardMoving()
-//                }
-//                repeat(3) {
-//                    turnWheelRight(30)
-//                }
-//                repeat(10) {
-//                    forwardMoving()
-//                }
-//                repeat(3) {
-//                    turnWheelRight(30)
-//                }
-//                repeat(10) {
-//                    forwardMoving()
-//                }
-//                repeat(3) {
-//                    turnWheelRight(30)
-//                }
-//                repeat(10) {
-//                    forwardMoving()
-//                }
             } finally {
                 stopWheel()
             }
         }
     }
+
 
     fun emergencyStop() = stop()
 
@@ -127,29 +109,17 @@ object InfinityDrivingManager {
         }
     }
 
-    suspend fun drawFigureEight180() {
-
-        BaseRobotController.robotService
-            ?.robotMotor
-            ?.motionStart("666_BA_TurnL180", null)
+    suspend fun drawFigureEight() {
+        DWLog.d("666_BA_TurnL360")
         delay(1800)
-
+        val actionName = "666_BA_TurnL360"
         BaseRobotController.robotService
             ?.robotMotor
-            ?.motionStart("666_BA_TurnL180", null)
-        delay(1800)
-
-        // 중앙 교차 느낌
-        delay(300)
-
-        BaseRobotController.robotService
-            ?.robotMotor
-            ?.motionStart("666_BA_TurnR180", null)
-        delay(1800)
-
-        BaseRobotController.robotService
-            ?.robotMotor
-            ?.motionStart("666_BA_TurnR180", null)
+            ?.motionStart(actionName, object : IMotionCallback.Stub() {
+                override fun finishMotion() {
+                    DWLog.d("${App.TAG} finishMotion [$actionName]")
+                }
+            })
     }
 
 

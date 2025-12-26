@@ -17,12 +17,8 @@ import kotlinx.coroutines.launch
 @Suppress("unused", "SpellCheckingInspection")
 abstract class UiAction {
     var isOpening = true
-    var isWakeUp = true
     var isWait = false
     var isSpeaking = false
-    var customHintText = ""
-    var etcMilis = 0L
-    var detailTime = ""
 
     private lateinit var _device: DEVICE
     val mDevice get() = _device

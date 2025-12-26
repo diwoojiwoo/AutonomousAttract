@@ -11,8 +11,11 @@ interface MainContract {
 
     interface Presenter {
         fun init()
+        fun start()
+        fun initState()
+        fun initSpeakingState()
         fun connect()
         fun disconnect()
-        fun playGreetingScenario()
+        fun speakMent()
     }
 }
